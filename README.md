@@ -1,7 +1,6 @@
 # aws_s3_with_python
 You will need to create an aws account, and then perform some settings,
 
-
 # New Features!
 
   - Import a HTML file and watch it magically convert to Markdown
@@ -164,7 +163,6 @@ MIT
    [node.js]: <http://nodejs.org>
    [Twitter Bootstrap]: <http://twitter.github.com/bootstrap/>
    [jQuery]: <http://jquery.com>
-   [@tjholowaychuk]: <http://twitter.com/tjholowaychuk>
    [express]: <http://expressjs.com>
    [AngularJS]: <http://angularjs.org>
    [Gulp]: <http://gulpjs.com>
