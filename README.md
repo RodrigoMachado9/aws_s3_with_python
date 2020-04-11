@@ -55,7 +55,12 @@ Install boto3
 ```sh
 $ pip install boto3
 ```
-
+Confgure your aws 
+ - configure your credentials in aws configure,  using credentials of user root.
+ - whether not understand or ( if you didn't understand ) following link : https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html.
+```sh
+$ aws configure 
+```
 
 For production environments...
 
