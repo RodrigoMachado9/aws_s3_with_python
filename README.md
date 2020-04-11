@@ -1,9 +1,6 @@
 # aws_s3_with_python
 You will need to create an aws account, and then perform some settings,
-https://aws.amazon.com/pt/cli/
-  - pip install awscli
-  - 
-  - 
+
 
 # New Features!
 
@@ -47,15 +44,19 @@ And of course Dillinger itself is open source with a [public repository][dill]
 
 ### Installation
 
-Dillinger requires [Node.js](https://nodejs.org/) v4+ to run.
-
-Install the dependencies and devDependencies and start the server.
+install aws cli and settings
+```sh
+$ https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-linux.html#cliv2-linux-install
+$ https://aws.amazon.com/pt/cli/
+$ pip install awscli
+```
+  
+Install boto3
 
 ```sh
-$ cd dillinger
-$ npm install -d
-$ node app
+$ pip install boto3
 ```
+
 
 For production environments...
 
