@@ -141,6 +141,13 @@ def s3_resource():
     return boto3.resource('s3')
 
 
+def read_object_from_bucket():
+    object_key = '2020/readme.txt'
+    return s3_client().get_object(Bucket=BUCKET_NAME, Key=object_key)
+
+
+
+
 if __name__ == '__main__':
     # print(create_bucket(BUCKET_NAME))
     # print(create_bucket_policy())
@@ -151,4 +158,5 @@ if __name__ == '__main__':
     # print(server_side_encrypt_bucket())
     # print(delete_bucket())
     # print('created is success' if upload_small_file() is None else None)
-    print(upload_large_file())
+    # print(upload_large_file())
+    print(read_object_from_bucket())
