@@ -6,7 +6,7 @@ import os
 import sys
 
 BUCKET_NAME = 'rmachado-development'
-
+WEBSITE_BUCKET_NAME = 'mys3rmachado.de'
 
 def s3_client():
     s3 = boto3.client('s3')
@@ -60,7 +60,7 @@ def get_bucket_cors():
     return s3_client().get_bucket_cors(Bucket=BUCKET_NAME)
 
 
-def update_bucket_policy():
+def update_bucket_policy(bucket_name):
     bucket_policy = {
         "Version": "2012-10-17",
         "Statement": [
@@ -73,10 +73,11 @@ def update_bucket_policy():
                     "s3:GetObject",
                     "s3:PutObject"
                 ],
-                "Resource": "arn:aws:s3:::rmachado-development/*"
+                "Resource": "arn:aws:s3:::%s/*" % bucket_name
             }
         ]
     }
+    print(bucket_policy)
     policy_string = json.dumps(bucket_policy)
     return s3_client().put_bucket_policy(
         Bucket=BUCKET_NAME,
@@ -134,10 +135,7 @@ class ProgressPercentage(object):
             sys.stdout.flush()
 
 
-
-
 def s3_resource():
-    # s3 = boto3.resource('s3')
     return boto3.resource('s3')
 
 
@@ -146,6 +144,86 @@ def read_object_from_bucket():
     return s3_client().get_object(Bucket=BUCKET_NAME, Key=object_key)
 
 
+def version_bucket_file():
+    s3_client().put_bucket_versioning(
+        Bucket=BUCKET_NAME,
+        VersioningConfiguration={
+            'Status': 'Enabled'
+        }
+    )
+
+def upload_a_new_version():
+    file_path = os.path.dirname(__file__) + '/readme.txt'
+    return s3_client().upload_file(file_path, BUCKET_NAME, 'readme.txt')
+
+
+def put_lifecycle_policy():
+    """
+    :url: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3.html#S3.Client.put_bucket_lifecycle_configuration
+    """
+
+    lifecycle_policy = {
+        "Rules": [
+            {
+                "ID": "Move readme file to Glacier",
+                "Prefix": "readme",
+                "Status": "Enabled",
+                "Transitions": [
+                    {
+                        "Date": "2020-04-12T00:00:00.000Z",
+                        "StorageClass": "GLACIER"
+                    }
+                ]
+            },
+            {
+                "Status": "Enabled",
+                "Prefix": "",
+                "NoncurrentVersionTransitions": [
+                    {
+                        "NoncurrentDays": 2,
+                        "StorageClass": "GLACIER"
+                    }
+                ],
+                "ID": "Move old versions to Glacier"
+            }
+        ]
+    }
+
+    s3_client().put_bucket_lifecycle_configuration(
+        Bucket=BUCKET_NAME,
+        LifecycleConfiguration=lifecycle_policy
+    )
+
+def host_static_website():
+    s3 = boto3.client('s3', region_name='us-west-2')
+    """ :type : pyboto3.s3 """
+
+    s3.create_bucket(
+        Bucket=WEBSITE_BUCKET_NAME,
+        CreateBucketConfiguration={
+            'LocationConstraint': 'us-west-2'
+        }
+    )
+
+    # update_bucket_policy(WEBSITE_BUCKET_NAME)
+
+    website_configuration = {
+        'ErrorDocument': {'Key': 'error.html'},
+        'IndexDocument': {'Suffix': 'index.html'}
+    }
+
+    s3_client().put_bucket_website(
+        Bucket=WEBSITE_BUCKET_NAME,
+        WebsiteConfiguration=website_configuration
+    )
+
+    index_file = os.path.dirname(__file__) + '/index.html'
+    error_file = os.path.dirname(__file__) + '/error.html'
+
+    s3_client().put_object(Bucket=WEBSITE_BUCKET_NAME, ACL='public-read', Key='index.html',
+                           Body=open(index_file).read(), ContentType='text/html')
+    s3_client().put_object(Bucket=WEBSITE_BUCKET_NAME, ACL='public-read', Key='error.html',
+                           Body=open(error_file).read(), ContentType='text/html')
 
 
 if __name__ == '__main__':
@@ -159,4 +237,8 @@ if __name__ == '__main__':
     # print(delete_bucket())
     # print('created is success' if upload_small_file() is None else None)
     # print(upload_large_file())
-    print(read_object_from_bucket())
+    # print(read_object_from_bucket())
+    # print(version_bucket_file())
+    # print(upload_a_new_version())
+    # print(put_lifecycle_policy())
+    print(host_static_website())
