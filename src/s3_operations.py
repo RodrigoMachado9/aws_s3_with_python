@@ -1,5 +1,5 @@
 import boto3
-import json
+import json, os
 BUCKET_NAME = 'rmachado-development'
 
 
@@ -93,12 +93,24 @@ def server_side_encrypt_bucket():
     )
 
 
+def delete_bucket():
+    return s3_client().delete_bucket(Bucket=BUCKET_NAME)
+
+def upload_small_file():
+    file_path = os.path.dirname(__file__) + '/readme.txt'
+    return s3_client().upload_file(file_path, BUCKET_NAME, 'readme.txt')
+
+
+
+
 if __name__ == '__main__':
-    # create_bucket(BUCKET_NAME)
+    # print(create_bucket(BUCKET_NAME))
     # print(create_bucket_policy())
     # print(list_buckets())
     # print(get_bucket_policy())
     # print(get_bucket_encryption())
     # print(update_bucket_policy())
-    print(server_side_encrypt_bucket())
+    # print(server_side_encrypt_bucket())
+    # print(delete_bucket())
+    # print(upload_small_file())
 
