@@ -1,6 +1,7 @@
 # aws_s3_with_python
 You will need to create an aws account, and then perform some settings,
-
+ - Documentation:
+ https://docs.aws.amazon.com/pt_br/AmazonS3/latest/dev/website-hosting-custom-domain-walkthrough.html#website-hosting-custom-domain-walkthrough-domain-registry
 # New Features!
 
   - Import a HTML file and watch it magically convert to Markdown

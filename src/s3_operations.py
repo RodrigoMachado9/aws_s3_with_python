@@ -205,7 +205,7 @@ def host_static_website():
         }
     )
 
-    # update_bucket_policy(WEBSITE_BUCKET_NAME)
+    # update_bucket_policy(WEBSITE_BUCKET_NAME) fixme;
 
     website_configuration = {
         'ErrorDocument': {'Key': 'error.html'},
@@ -226,13 +226,64 @@ def host_static_website():
                            Body=open(error_file).read(), ContentType='text/html')
 
 
+def route_53_record_for_s3_website():
+    """
+    :documentation: https://docs.aws.amazon.com/pt_br/AmazonS3/latest/dev/website-hosting-custom-domain-walkthrough.html#website-hosting-custom-domain-walkthrough-domain-registry
+    :region_endpoints: https://docs.aws.amazon.com/general/latest/gr/s3.html#s3_website_region_endpoints
+    :doc: https://docs.aws.amazon.com/general/latest/rande.html#s3_region
+    :endpoint_by_oregon: http://mys3rmachado.de.s3-website-us-west-2.amazonaws.com/
+    """
+
+    website_dns_name = "s3-website-us-west-2.amazonaws.com"
+    redirect_dns_name = "s3-website-us-west-2.amazonaws.com"
+
+    route53 = boto3.client('route53')
+    """ :type: pyboto3.route53 """
+
+    domain = WEBSITE_BUCKET_NAME
+    www_redirect = 'www.' + WEBSITE_BUCKET_NAME
+
+    change_batch_payload = {
+        'Changes': [
+            {
+                'Action': 'UPSERT',
+                'ResourceRecordSet': {
+                    'Name': domain,
+                    'Type': 'A',
+                    'AliasTarget': {
+                        'HostedZoneId': 'Z3BJ6K6RIION7M',
+                        'DNSName': website_dns_name,
+                        'EvaluateTargetHealth': False
+                    }
+                }
+            },
+            {
+                'Action': 'UPSERT',
+                'ResourceRecordSet': {
+                    'Name': www_redirect,
+                    'Type': 'A',
+                    'AliasTarget': {
+                        'HostedZoneId': 'Z3BJ6K6RIION7M',
+                        'DNSName': redirect_dns_name,
+                        'EvaluateTargetHealth': False
+                    }
+                }
+            }
+        ]
+    }
+
+    return route53.change_resource_record_sets(
+        HostedZoneId='Z0894447H4ME9F4296NR',
+        ChangeBatch=change_batch_payload
+    )
+
 if __name__ == '__main__':
     # print(create_bucket(BUCKET_NAME))
     # print(create_bucket_policy())
     # print(list_buckets())
     # print(get_bucket_policy())
     # print(get_bucket_encryption())
-    # print(update_bucket_policy())
+    # print(update_bucket_policy(BUCKET_NAME))
     # print(server_side_encrypt_bucket())
     # print(delete_bucket())
     # print('created is success' if upload_small_file() is None else None)
@@ -241,4 +292,5 @@ if __name__ == '__main__':
     # print(version_bucket_file())
     # print(upload_a_new_version())
     # print(put_lifecycle_policy())
-    print(host_static_website())
+    # print(host_static_website())
+    print(route_53_record_for_s3_website())
