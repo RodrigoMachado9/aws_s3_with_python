@@ -78,6 +78,20 @@ def update_bucket_policy():
         Policy=policy_string
     )
 
+def server_side_encrypt_bucket():
+    return s3_client().put_bucket_encryption(
+        Bucket=BUCKET_NAME,
+        ServerSideEncryptionConfiguration={
+            "Rules": [
+                {
+                    "ApplyServerSideEncryptionByDefault": {
+                        "SSEAlgorithm": "AES256"
+                    }
+                }
+            ]
+        }
+    )
+
 
 if __name__ == '__main__':
     # create_bucket(BUCKET_NAME)
@@ -85,5 +99,6 @@ if __name__ == '__main__':
     # print(list_buckets())
     # print(get_bucket_policy())
     # print(get_bucket_encryption())
-    print(update_bucket_policy())
+    # print(update_bucket_policy())
+    print(server_side_encrypt_bucket())
 
