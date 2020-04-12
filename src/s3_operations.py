@@ -1,5 +1,10 @@
+from boto3.s3.transfer import TransferConfig
+import threading
 import boto3
-import json, os
+import json
+import os
+import sys
+
 BUCKET_NAME = 'rmachado-development'
 
 
@@ -98,9 +103,42 @@ def delete_bucket():
 
 def upload_small_file():
     file_path = os.path.dirname(__file__) + '/readme.txt'
-    return s3_client().upload_file(file_path, BUCKET_NAME, 'readme.txt')
+    return s3_client().upload_file(file_path, BUCKET_NAME, '2020/readme.txt')
 
 
+def upload_large_file():
+    config = TransferConfig(multipart_threshold=1024 * 25, max_concurrency=10,
+                            multipart_chunksize=1024 * 25, use_threads=True)
+    file_path = os.path.dirname(__file__) + '/codigo_limpo.pdf'
+    key_path = 'multipart_files/codigo_limpo.pdf'
+
+    s3_resource().meta.client.upload_file(file_path, BUCKET_NAME, key_path, ExtraArgs={
+        'ACL': 'public-read',
+        'ContentType': 'text/pdf'},
+                                          Config=config,
+                                          Callback=ProgressPercentage(file_path)
+                                          )
+class ProgressPercentage(object):
+    def __init__(self, filename):
+        self._filename = filename
+        self._size = float(os.path.getsize(filename))
+        self._seen_so_far = 0
+        self._lock = threading.Lock()
+
+    def __call__(self, bytes_amount):
+        with self._lock:
+            self._seen_so_far += bytes_amount
+            percentage = (self._seen_so_far / self._size) * 100
+            sys.stdout.write(
+                "\r%s  %s / %s  (%.2f%%)" % (self._filename, self._seen_so_far, self._size, percentage))
+            sys.stdout.flush()
+
+
+
+
+def s3_resource():
+    # s3 = boto3.resource('s3')
+    return boto3.resource('s3')
 
 
 if __name__ == '__main__':
@@ -112,5 +150,5 @@ if __name__ == '__main__':
     # print(update_bucket_policy())
     # print(server_side_encrypt_bucket())
     # print(delete_bucket())
-    # print(upload_small_file())
-
+    # print('created is success' if upload_small_file() is None else None)
+    print(upload_large_file())
