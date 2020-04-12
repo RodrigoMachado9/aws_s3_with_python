@@ -1,7 +1,7 @@
 # aws_s3_with_python
 You will need to create an aws account, and then perform some settings,
-
-
+ - Documentation:
+ https://docs.aws.amazon.com/pt_br/AmazonS3/latest/dev/website-hosting-custom-domain-walkthrough.html#website-hosting-custom-domain-walkthrough-domain-registry
 # New Features!
 
   - Import a HTML file and watch it magically convert to Markdown
@@ -56,7 +56,12 @@ Install boto3
 ```sh
 $ pip install boto3
 ```
-
+Confgure your aws 
+ - configure your credentials in aws configure,  using credentials of user root.
+ - whether not understand or ( if you didn't understand ) following link : https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html.
+```sh
+$ aws configure 
+```
 
 For production environments...
 
@@ -164,7 +169,6 @@ MIT
    [node.js]: <http://nodejs.org>
    [Twitter Bootstrap]: <http://twitter.github.com/bootstrap/>
    [jQuery]: <http://jquery.com>
-   [@tjholowaychuk]: <http://twitter.com/tjholowaychuk>
    [express]: <http://expressjs.com>
    [AngularJS]: <http://angularjs.org>
    [Gulp]: <http://gulpjs.com>
